@@ -22,7 +22,7 @@ app.use(express.logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
-app.use(express.cookieParser('cookie_pasword_lol_secure'));
+app.use(express.cookieParser('cookie_pasword_lol_secure?'));
 app.use(express.session());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
@@ -39,7 +39,7 @@ app.get('/chat/*', chat.show);
 io.sockets.on('connection', function (socket) {
     socket.on('message',function(data,cb){
         console.log(data);
-        socket.broadcast.to(data.room).emit('message', {from:socket.id,message:data.message});
+        socket.broadcast.to(data.room).emit('message', {from:socket.id,data:data});
         cb({'status':'ok'});
     });
     socket.on('subscribe', function(data) {
@@ -49,7 +49,10 @@ io.sockets.on('connection', function (socket) {
     socket.on('unsubscribe', function(data) {
         socket.leave(data.room);
     });
-
+    
+    socket.on('disconnect', function() { //kick it out
+        
+    });
 });
 
 server.listen(app.get('port'), function(){
