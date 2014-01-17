@@ -37,38 +37,40 @@ app.get('/chat/*', chat.show);
 
 
 io.sockets.on('connection', function (socket) {
+    var room;
     socket.on('message',function(data,cb){
-        socket.broadcast.to(data.room).emit('message', {from:socket.id,data:data});
+        socket.broadcast.to(room).emit('message', {from:socket.id,data:data});
         cb({'status':'ok'});
     });
     
     socket.on('public key',function(data){
-        socket.broadcast.to(data.room).emit('public key', {from:socket.id,data:data});
+        socket.broadcast.to(room).emit('public key', {from:socket.id,data:data});
+    });
+    
+    socket.on('delivery',function(msgHash){
+        socket.broadcast.to(room).emit('delivery',msgHash);
     });
     
     socket.on('subscribe', function(data,cb) {
         console.log(socket.id+" joining "+data.room)
         var clients=io.sockets.clients(data.room);
         if(clients.length<2){
-            socket.set('room', data.room, function () {
-                socket.join(data.room);
-                socket.emit('joined');
-                cb({'status':'ok'});
-                if(clients.length==1){
-                    io.sockets.in(data.room).emit('partner connected');
-                    socket.emit('partner connected');
-                }
-            });
+            room=data.room;
+            socket.join(data.room);
+            socket.emit('joined');
+            cb({'status':'ok'});
+            if(clients.length==1){
+                socket.broadcast.to(data.room).emit('partner connected');
+                socket.emit('partner connected');
+            }
         }else{
             cb({'status':'failed'});
         }
     });
 
     socket.on('disconnect', function() { //kick it out
-        socket.get('room', function (err,room) {
-            socket.leave(room);
-            socket.broadcast.to(room).emit('partner left');
-        });
+        socket.leave(room);
+        socket.broadcast.to(room).emit('partner left');
     });
 });
 

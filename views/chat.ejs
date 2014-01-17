@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>Narrow Jumbotron Template for Bootstrap</title>
+    <title>Secure Chat</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
@@ -21,8 +21,8 @@
 </head>
 
 <body>
-<div class="container" ng-controller="ChatCtrl">
-    <div> {{ status }} </div>
+<div class="container">
+    <div id="status"></div>
     <div class="row">
         <div class="col-md-5">
             <div class="panel panel-primary">
@@ -30,41 +30,13 @@
                     <span class="glyphicon glyphicon-comment"></span> Chat
                 </div>
                 <div id="chat-area" class="panel-body">
-                    <ul class="chat">
-                        <div ng-repeat="log in logs track by $index" >
-                        <li ng-if="log.from!='Me'" class="left clearfix">
-                            <span class="chat-img pull-left">
-                            <img src="http://placehold.it/50/55C1E7/fff&text=U" alt="User Avatar" class="img-circle" />
-                            </span>
-                            <div class="chat-body clearfix">
-                                <div class="header">
-                                    <strong class="primary-font">{{ log.from }}</strong> <small class="pull-right text-muted">
-                                        <span class="glyphicon glyphicon-time"></span>12 mins ago</small>
-                                </div>
-                                <p>{{ log.message }} ({{ log.status }})
-                                </p>
-                            </div>
-                        </li>
-                        <li ng-if="log.from=='Me'" class="right clearfix">
-                            <span class="chat-img pull-right">
-                            <img src="http://placehold.it/50/FA6F57/fff&text=ME" alt="User Avatar" class="img-circle" />
-                            </span>
-                            <div class="chat-body clearfix">
-                                <div class="header">
-                                    <small class=" text-muted"><span class="glyphicon glyphicon-time"></span>13 mins ago</small>
-                                    <strong class="pull-right primary-font">Me</strong>
-                                </div>
-                                <p>{{ log.message }} ({{ log.status }})
-                                </p>
-                            </div>
-                         </li>                          
-                        </div>
+                    <ul id="chat-list" class="chat">
                     </ul>
                 </div>
                 <div class="panel-footer">
-                    <form ng-submit="sendMessage()">
+                    <form id="message-form">
                     <div class="input-group">
-                        <input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..." ng-model="messageLine"/>
+                        <input id="message-input" type="text" class="form-control input-sm" placeholder="Type your message here..." />
                         <span class="input-group-btn">
                             <button class="btn btn-warning btn-sm" id="btn-chat">
                                 Send</button>
@@ -78,7 +50,6 @@
 </div>    
 <script src="/js/jquery-1.10.2.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
-<script src="/js/angular.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/sjcl.js"></script>
 <script src="/js/chat.js"></script>
