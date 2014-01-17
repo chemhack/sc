@@ -47,6 +47,7 @@ io.sockets.on('connection', function (socket) {
     });
     
     socket.on('subscribe', function(data,cb) {
+        console.log(socket.id+" joining "+data.room)
         var clients=io.sockets.clients(data.room);
         if(clients.length<2){
             socket.set('room', data.room, function () {

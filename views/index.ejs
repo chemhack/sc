@@ -22,10 +22,13 @@
 <body>
 <div class="container">
     <h2>Secure Chat</h2>
-    <a class="btn btn-primary" href="">Create a Room</a>
+    <a id="create" class="btn btn-primary">Create a Room</a>
 </div>
 <script src="/js/jquery-1.10.2.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script>
+    $("#create").attr('href','/chat/'+Math.random());
+</script>
 </body>
 </html>
