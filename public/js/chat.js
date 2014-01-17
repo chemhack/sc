@@ -1,5 +1,4 @@
 var socket = io.connect();
-
 var keys = {};
 var generateMyKeyPair=function(){
     keys.myKeyPair = sjcl.ecc.elGamal.generateKeys(384);
@@ -26,7 +25,7 @@ var appendMyMessage=function(message,hash){
 };
 
 var appendYourMessage=function(message,hash){
-    chat_list.append('<li class="right clearfix"><span class="chat-img pull-left"><img src="http://placehold.it/50/FA6F57/fff&text=You" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><div class="header"><small class=" text-muted"><span class="glyphicon glyphicon-ok"></span><span id="status-'+hash+'">Received</span></small><strong class="pull-left primary-font">Your Partener</strong></div><p>'
+    chat_list.append('<li class="right clearfix"><span class="chat-img pull-left"><img src="http://placehold.it/50/FA6F57/fff&text=You" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><div class="header"><strong class="primary-font">Your Partener</strong></div><p>'
      + message 
      + '</p></li>');
     chat_area.scrollTop(chat_area[0].scrollHeight);
