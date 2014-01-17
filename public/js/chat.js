@@ -17,7 +17,7 @@ var calculateSharedKey=function(yourKeyHex){
 };
 
 
-var roomId='12345';
+var roomId=window.location;
 
 generateMyKeyPair();
 
