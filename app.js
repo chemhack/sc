@@ -38,20 +38,36 @@ app.get('/chat/*', chat.show);
 
 io.sockets.on('connection', function (socket) {
     socket.on('message',function(data,cb){
-        console.log(data);
         socket.broadcast.to(data.room).emit('message', {from:socket.id,data:data});
         cb({'status':'ok'});
     });
-    socket.on('subscribe', function(data) {
-        socket.join(data.room);
-    });
-
-    socket.on('unsubscribe', function(data) {
-        socket.leave(data.room);
+    
+    socket.on('public key',function(data){
+        socket.broadcast.to(data.room).emit('public key', {from:socket.id,data:data});
     });
     
+    socket.on('subscribe', function(data,cb) {
+        var clients=io.sockets.clients(data.room);
+        if(clients.length<2){
+            socket.set('room', data.room, function () {
+                socket.join(data.room);
+                socket.emit('joined');
+                cb({'status':'ok'});
+                if(clients.length==1){
+                    io.sockets.in(data.room).emit('partner connected');
+                    socket.emit('partner connected');
+                }
+            });
+        }else{
+            cb({'status':'failed'});
+        }
+    });
+
     socket.on('disconnect', function() { //kick it out
-        
+        socket.get('room', function (err,room) {
+            socket.leave(room);
+            socket.broadcast.to(room).emit('partner left');
+        });
     });
 });
 

@@ -1,7 +1,6 @@
 var chatApp = angular.module('chatApp', []);
 var socket = io.connect();
 
-var roomId='12345';
 
 var keys = {};
 var generateMyKeyPair=function(){
@@ -14,14 +13,22 @@ var calculateSharedKey=function(yourKeyHex){
     keys.yourPublicKeyHex=yourKeyHex;
     var yourKeyBits = sjcl.codec.hex.toBits(yourKeyHex);
     keys.yourPublicKey = new sjcl.ecc.elGamal.publicKey(sjcl.ecc.curves.c384, yourKeyBits);
-    console.log(keys.myKeyPair.pub.dh(keys.yourPublicKey));
+    keys.sharedKey=keys.myKeyPair.sec.dh(keys.yourPublicKey);
 };
 
 
+var roomId='12345';
+
+generateMyKeyPair();
 
 chatApp.controller('ChatCtrl', function ($scope) {
     $scope.logs=[];
-    socket.emit('subscribe',{room:roomId});
+    socket.emit('subscribe',{room:roomId},function(data){
+        if(data.status=='ok'){
+            $scope.status="subscribed";
+            $scope.$digest();
+        }
+    });
     $scope.sendMessage=function(){
         if($scope.messageLine){
             var messageLog={
@@ -30,10 +37,12 @@ chatApp.controller('ChatCtrl', function ($scope) {
                 status:'sending'
             };
             $scope.logs.push(messageLog);
-            socket.emit('message',{room:roomId,message:$scope.messageLine},function(data){
-                $scope.$apply(function(){
-                    messageLog.status='sent';
-                });
+
+            var messageObj={message:sjcl.encrypt(keys.sharedKey, ($scope.messageLine))};
+            console.log(messageObj);
+            socket.emit('message',messageObj,function(data){
+                messageLog.status='sent';
+                $scope.$digest();
             });
             $scope.messageLine='';
             setTimeout(function(){
@@ -42,10 +51,27 @@ chatApp.controller('ChatCtrl', function ($scope) {
             }, 0);
         }
     };
+    
+    socket.on('partner connected',function(){
+        $scope.status="partner connected";
+        $scope.$digest();
+        socket.emit('public key',keys.myPublicKeyHex);
+    });
+    
+    socket.on('public key',function(data){
+        $scope.status="partner key got, from " +data.from;
+        $scope.$digest();
+        calculateSharedKey(data.data);
+        $scope.status="key calculated, from " +data.from+", key "+keys.sharedKey;
+        $scope.$digest();
+        keys.cipher=new sjcl.cipher.aes(keys.sharedKey);
+        // socket.emit('public key',keys.myPublicKeyHex);
+    });
+
     socket.on('message', function (data) {
         var messageLog={
             from:'The other one',
-            message:data.message,
+            message:sjcl.decrypt(keys.sharedKey,data.data.message),
             status:'Recv'
         };
         $scope.logs.push(messageLog);
