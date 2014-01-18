@@ -70,6 +70,14 @@ socket.on('message', function (data) {
     var message=sjcl.decrypt(keys.sharedKey,data.data.message);
     var msgHash=sjcl.codec.hex.fromBits(sjcl.hash.sha1.hash(JSON.stringify(data.data)));
     appendYourMessage(message, msgHash);
+    $.titleAlert("New chat message!", {
+            requireBlur:true,
+            stopOnFocus:true,
+            duration:0,
+            stopOnMouseMove:true,
+            interval:700
+    });
+    soundManager.play('message');
     socket.emit("delivery",msgHash);
 });
 
@@ -88,6 +96,22 @@ socket.on('connect',function(){
             appendStatusMessage("Waiting for partner. Send this link: "+window.location.href+". You will be notified when your partner is connected. After that you can chat safely.");
         }
     });
+});
+
+soundManager.setup({
+    url: '/swf/',
+
+    onready: function() {
+        soundManager.createSound({
+         id: 'message',
+         url: '/message.mp3'
+        });
+    },
+
+    ontimeout: function() {
+      // Uh-oh. No HTML5 support, SWF missing, Flash blocked or other issue
+    }
+
 });
 
 $('#message-form').submit(function(event){
