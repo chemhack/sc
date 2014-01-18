@@ -56,34 +56,21 @@ var sendMessage=function(){
 
 
 socket.on('partner connected',function(){
-    appendStatusMessage("partner connected");
+    appendStatusMessage("Partner connected, negotiating encryption keys");
     socket.emit('public key',keys.myPublicKeyHex);
 });
 
 socket.on('public key',function(data){
-    appendStatusMessage("partner key got, from " +data.from);
     calculateSharedKey(data.data);
-    appendStatusMessage("key calculated, from " +data.from+", key "+keys.sharedKey);
+    appendStatusMessage("keys negotiated, from " +data.from+", key "+sjcl.codec.hex.fromBits(keys.sharedKey));
     keys.cipher=new sjcl.cipher.aes(keys.sharedKey);
 });
 
 socket.on('message', function (data) {
-    // var messageLog={
-    //     from:'The other one',
-    //     message:sjcl.decrypt(keys.sharedKey,data.data.message),
-    //     status:'Recv'
-    // };
     var message=sjcl.decrypt(keys.sharedKey,data.data.message);
-    // $scope.logs.push(messageLog);
-    // $scope.$digest();
     var msgHash=sjcl.codec.hex.fromBits(sjcl.hash.sha1.hash(JSON.stringify(data.data)));
     appendYourMessage(message, msgHash);
-
     socket.emit("delivery",msgHash);
-    // setTimeout(function(){
-    //     var $list= $("#chat-area");
-    //     $list.scrollTop($list[0].scrollHeight);
-    // }, 0);
 });
 
 socket.on('delivery', function (hash) {
@@ -92,15 +79,19 @@ socket.on('delivery', function (hash) {
 
 
 var roomId=window.location.pathname;
-
 generateMyKeyPair();
+
+socket.on('connect',function(){
+    appendStatusMessage("Connecting to the server...");
+    socket.emit('subscribe',{room:roomId},function(data){
+        if(data.status=='ok'){
+            appendStatusMessage("Waiting for partner. Send this link: "+window.location.href+". You will be notified when your partner is connected. After that you can chat safely.");
+        }
+    });
+});
 
 $('#message-form').submit(function(event){
     event.preventDefault();
     sendMessage();
 });
-socket.emit('subscribe',{room:roomId},function(data){
-    if(data.status=='ok'){
-        appendStatusMessage("subscribed");
-    }
-});
+
