@@ -60,6 +60,11 @@ socket.on('partner connected',function(){
     socket.emit('public key',keys.myPublicKeyHex);
 });
 
+socket.on('partner disconnected',function(){
+    appendStatusMessage("Partner disconnected");
+    keys.sharedKey=null;
+});
+
 socket.on('public key',function(data){
     calculateSharedKey(data.data);
     appendStatusMessage("keys negotiated, from " +data.from+", key "+sjcl.codec.hex.fromBits(keys.sharedKey));

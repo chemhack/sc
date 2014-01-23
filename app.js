@@ -70,7 +70,7 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('disconnect', function() { //kick it out
         socket.leave(room);
-        socket.broadcast.to(room).emit('partner left');
+        socket.broadcast.to(room).emit('partner disconnected');
     });
 });
 
