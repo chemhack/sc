@@ -4,11 +4,13 @@ var generateMyKeyPair=function(){
     keys.myKeyPair = sjcl.ecc.elGamal.generateKeys(384);
     var publicKey = keys.myKeyPair.pub.get();
     keys.myPublicKeyHex = sjcl.codec.hex.fromBits(publicKey.x) + sjcl.codec.hex.fromBits(publicKey.y);
+    $('#my-pk').text(sjcl.codec.hex.fromBits(sjcl.hash.sha1.hash(keys.myPublicKeyHex)));
 };
 
 var calculateSharedKey=function(yourKeyHex){
     keys.yourPublicKeyHex=yourKeyHex;
     var yourKeyBits = sjcl.codec.hex.toBits(yourKeyHex);
+    $('#your-pk').text(sjcl.codec.hex.fromBits(sjcl.hash.sha1.hash(yourKeyHex)));
     keys.yourPublicKey = new sjcl.ecc.elGamal.publicKey(sjcl.ecc.curves.c384, yourKeyBits);
     keys.sharedKey=keys.myKeyPair.sec.dh(keys.yourPublicKey);
 };
@@ -25,7 +27,7 @@ var appendMyMessage=function(message,hash){
 };
 
 var appendYourMessage=function(message,hash){
-    chat_list.append('<li class="right clearfix"><span class="chat-img pull-left"><img src="http://placehold.it/50/FA6F57/fff&text=You" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><div class="header"><strong class="primary-font">Your Partener</strong></div><p>'
+    chat_list.append('<li class="right clearfix"><span class="chat-img pull-left"><img src="http://placehold.it/50/FA6F57/fff&text=You" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><div class="header"><strong class="primary-font">Your Partner</strong></div><p>'
      + message 
      + '</p></li>');
     chat_area.scrollTop(chat_area[0].scrollHeight);
@@ -63,6 +65,7 @@ socket.on('partner connected',function(){
 socket.on('partner disconnected',function(){
     appendStatusMessage("Partner disconnected");
     keys.sharedKey=null;
+    $('#your-pk').text('');
 });
 
 socket.on('public key',function(data){
@@ -98,7 +101,7 @@ socket.on('connect',function(){
     appendStatusMessage("Connecting to the server...");
     socket.emit('subscribe',{room:roomId},function(data){
         if(data.status=='ok'){
-            appendStatusMessage("Waiting for partner. Send this link: "+window.location.href+". You will be notified when your partner is connected. After that you can chat safely.");
+            appendStatusMessage("Waiting for partner. Send this link: "+window.location.href+"");
         }
     });
 });

@@ -1,16 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" id="ng-app">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>Narrow Jumbotron Template for Bootstrap</title>
+    <title>Secure Chat</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -18,20 +17,59 @@
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
+    <script>
+        UUIDv4 = function b(a){return a?(a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,b)}
+        function createChat() {
+            window.location.href='/chat/'+UUIDv4();
+        }
+    </script>
 </head>
 <body>
-<div class="container">
-    <h2>Secure Chat</h2>
-    <a id="create" class="btn btn-primary">Create a Room</a>
-</div>
+    <div class="container">
+      <div class="header">
+        <ul class="nav nav-pills pull-right">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="https://github.com/chemhack/sc" target="_blank">GitHub</a></li>
+        </ul>
+        <h3 class="text-muted">Secure Chat</h3>
+      </div>
+    
+      <div class="jumbotron">
+        <h1>Secure Chat</h1>
+        <p class="lead">An easy to use, truely encrypted, off the record, anonymous chat service.</p>
+        <p><a id="create" class="btn btn-lg btn-success" href="javascript:createChat()" role="button">Start a new Chat</a></p>
+      </div>
+    
+      <div class="row marketing">
+        <div class="col-lg-6">
+          <h4>Client Side Encryption</h4>
+          <p>Secure Chat uses state of the art 256-bits <a href="http://en.wikipedia.org/wiki/Advanced_Encryption_Standard" target="_blank">AES</a> encryption. Encryption is done at client side with javascript. Our server or other third parties will never be able to reconstruct cleartext.</p>
+
+          <h4>Open Source</h4>
+          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+    
+        </div>
+    
+        <div class="col-lg-6">
+          <h4>Anonymous Key Agreement</h4>
+          <p><a href="http://en.wikipedia.org/wiki/Elliptic_curve_Diffie–Hellman" target="_blank">Elliptic curve Diffie–Hellman</a> key agreement protocol is used to ensure that even our server is not able to find your encryption key.</p>
+
+          <h4>Subheading</h4>
+          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+              
+        </div>
+      </div>
+    
+      <div class="footer">
+        <p>&copy; chemhack 2013</p>
+      </div>
+    
+    </div>
 <script src="/js/jquery-1.10.2.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/sjcl.js"></script>
 <script src="/js/jquery.titlealert.js"></script>
 <script src="/js/soundmanager2.min.js"></script>
-<script>
-    $("#create").attr('href','/chat/'+Math.random());
-</script>
 </body>
 </html>
